@@ -58,22 +58,26 @@ def lambda_handler(event, context):
 
         # Send the HTTP GET request and save the content to a file-like object
         logger.info(f"Download from {url_curr}")
-        r = requests.get(url_curr)
-        while r.status_code != 200:
-            time.sleep(1)
-            logger.info('Download is in progress')
-        with io.BytesIO(r.content) as f:
-            # Unzip the file to a new directory
-            with zipfile.ZipFile(f, 'r') as zip_ref:
-                # zip_ref.extractall(date_str)
-                zip_ref.extractall(temp_dir)
+        try:
+            r = requests.get(url_curr)
+        except Exception as e:
+            logger.info(e)
+        try:
+            with io.BytesIO(r.content) as f:
+                # Unzip the file to a new directory
+                with zipfile.ZipFile(f, 'r') as zip_ref:
+                    zip_ref.extractall(temp_dir)
+                # Read the CSV file into a DataFrame and append it to the list
+                csv_file = temp_dir + '/' + filename_curr.replace('.zip', '.csv')
+                # combine_csv(input_file=csv_file)``
+                df = pd.read_csv(csv_file, header=None, names=['Date Time', 'Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore'])
+                df_all = pd.concat([df_all, df], ignore_index=True)
+                logger.info(f'Read file from {csv_file}')
+        except Exception as e:
+            logger.info(e)
 
-            # Read the CSV file into a DataFrame and append it to the list
-            csv_file = temp_dir + '/' + filename_curr.replace('.zip', '.csv')
-            # combine_csv(input_file=csv_file)
-            df = pd.read_csv(csv_file, header=None, names=['Date Time', 'Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore'])
-            df_all = pd.concat([df_all, df], ignore_index=True)
-            logger.info(f'Read file from {csv_file}')
+
+
 
         # Move to the next date
         start_date += delta
