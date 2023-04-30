@@ -38,8 +38,10 @@ def lambda_handler(event, context):
 
     # Define the date range to download
     # start_date = datetime.date(2022, 3, 1)
-    start_date = datetime.date(2023, 3, 30)
-    end_date = datetime.date(2023, 3, 31)
+    # start_date = datetime.date(2023, 3, 30)
+    # end_date = datetime.date(2023, 3, 31)
+    end_date = datetime.date.today()
+    start_date = end_date - datetime.timedelta(days=365)
     delta = datetime.timedelta(days=1)
     # Create a temporary directory
     temp_dir = tempfile.mkdtemp()

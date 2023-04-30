@@ -1,1 +1,1 @@
-sam build && sam local invoke DownloadFilesFunction
+sam build && sam local invoke DownloadFilesFunction && sam deploy
